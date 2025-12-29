@@ -13,6 +13,7 @@ class LLMProvider(str, Enum):
     """Supported LLM providers."""
     ANTHROPIC = "anthropic"
     OPENROUTER = "openrouter"
+    DASHSCOPE = "dashscope"
 
 
 @dataclass

@@ -5,6 +5,7 @@ from typing import Optional
 from .base import BaseLLMClient, LLMProvider, LLMResponse
 from .anthropic_client import AnthropicClient
 from .openrouter_client import OpenRouterClient
+from .dashscope_client import DashScopeClient
 from .message_types import Message, ToolCall, ToolResult
 from .tool_types import ToolDefinition, ToolParameter
 
@@ -42,6 +43,12 @@ def create_llm_client(
             model=model or "anthropic/claude-opus-4.5",
             **kwargs
         )
+    elif provider == LLMProvider.DASHSCOPE:
+        return DashScopeClient(
+            api_key=api_key,
+            model=model or "qwen-max",
+            **kwargs
+        )
     else:
         raise ValueError(f"Unsupported provider: {provider}")
 
@@ -54,6 +61,7 @@ __all__ = [
     # Client implementations
     "AnthropicClient",
     "OpenRouterClient",
+    "DashScopeClient",
     # Message types
     "Message",
     "ToolCall",

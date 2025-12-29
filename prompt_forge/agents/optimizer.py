@@ -30,8 +30,8 @@ from config import (
     get_llm_provider,
     get_api_key,
     get_model,
+    get_max_tokens,
     DEFAULT_TEMPERATURE,
-    DEFAULT_MAX_TOKENS,
 )
 from models.schemas import OptimizedPrompt, PromptChange
 from utils.logger import FileLogger
@@ -118,7 +118,7 @@ class OptimizerAgent:
             api_key=api_key,
             model=model,
             temperature=DEFAULT_TEMPERATURE,
-            max_tokens=DEFAULT_MAX_TOKENS,
+            max_tokens=get_max_tokens(llm_provider),
         )
 
     async def optimize(

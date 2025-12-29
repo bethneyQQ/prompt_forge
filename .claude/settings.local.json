@@ -9,7 +9,13 @@
       "WebFetch(domain:lightrains.com)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:www.helicone.ai)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "WebFetch(domain:help.aliyun.com)",
+      "Bash(python3:*)",
+      "Bash(PYTHONPATH=/home/shared/beth/temp/prompt_forge/prompt_forge python3:*)",
+      "Bash(git -C /home/shared/beth/temp/prompt_forge status)",
+      "Bash(git -C /home/shared/beth/temp/prompt_forge diff --stat)",
+      "Bash(git -C /home/shared/beth/temp/prompt_forge log --oneline -5)"
     ]
   }
 }

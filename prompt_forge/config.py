@@ -10,19 +10,24 @@ load_dotenv()
 # LLM Provider Configuration
 # =============================================================================
 
-# Provider selection: "anthropic" or "openrouter"
+# Provider selection: "anthropic", "openrouter", or "dashscope"
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openrouter")
 
 # API Keys
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+DASHSCOPE_API_KEY = os.getenv("DASHSCOPE_API_KEY", "")
 
 # OpenRouter settings
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
+# DashScope settings
+DASHSCOPE_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+
 # Model configuration
 PRIMARY_MODEL = os.getenv("PRIMARY_MODEL", "anthropic/claude-opus-4.5")
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-4-5-20251101")
+DASHSCOPE_MODEL = os.getenv("DASHSCOPE_MODEL", "qwen-max")
 FALLBACK_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
 
 # Model parameters
@@ -45,6 +50,8 @@ def get_api_key(provider: str | None = None) -> str:
         return ANTHROPIC_API_KEY
     elif provider == "openrouter":
         return OPENROUTER_API_KEY
+    elif provider == "dashscope":
+        return DASHSCOPE_API_KEY
     raise ValueError(f"Unknown provider: {provider}")
 
 
@@ -55,7 +62,17 @@ def get_model(provider: str | None = None) -> str:
         return ANTHROPIC_MODEL
     elif provider == "openrouter":
         return PRIMARY_MODEL
+    elif provider == "dashscope":
+        return DASHSCOPE_MODEL
     return PRIMARY_MODEL
+
+
+def get_max_tokens(provider: str | None = None) -> int:
+    """Get the max_tokens limit for the specified provider."""
+    provider = provider or LLM_PROVIDER
+    if provider == "dashscope":
+        return 8192  # DashScope qwen-max limit
+    return DEFAULT_MAX_TOKENS
 
 
 def get_supported_providers() -> list[str]:

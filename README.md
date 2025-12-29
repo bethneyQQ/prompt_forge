@@ -45,8 +45,9 @@ Returns optimized prompt + change summary
 ### Setup
 
 ```bash
-# 1. Enter project directory
-cd prompt_forge
+# 1. Clone and enter project directory
+git clone <repo-url>
+cd prompt_forge/prompt_forge
 
 # 2. Install dependencies
 pip install -r requirements.txt
@@ -54,19 +55,25 @@ pip install -r requirements.txt
 # 3. Configure environment variables
 cp env.example .env
 
-# 4. Edit .env file
-# Choose LLM provider: anthropic or openrouter
-LLM_PROVIDER=openrouter
-
-# Enter API Key (choose one)
-OPENROUTER_API_KEY=your_key_here
-ANTHROPIC_API_KEY=your_key_here
+# 4. Edit .env file and set your API key
+#    Choose LLM provider: "anthropic", "openrouter", or "dashscope"
+#
+#    Required variables:
+#    - LLM_PROVIDER: anthropic, openrouter, or dashscope
+#    - API key for your chosen provider:
+#      - ANTHROPIC_API_KEY (for Anthropic)
+#      - OPENROUTER_API_KEY (for OpenRouter)
+#      - DASHSCOPE_API_KEY (for Alibaba DashScope/Qwen)
+#
+#    Optional variables:
+#    - FIRECRAWL_API_KEY: for documentation updates
+#    - PRIMARY_MODEL / DASHSCOPE_MODEL: override default model
 ```
 
 ### Start Service
 
 ```bash
-cd prompt_forge
+# From prompt_forge/prompt_forge directory
 uvicorn main:app --reload --port 8000
 ```
 
