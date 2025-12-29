@@ -1,98 +1,150 @@
 # Prompt Forge
 
-A prompt optimization system that adapts your prompts for different AI providers. 
+An intelligent prompt optimization system that automatically adapts your prompts to different AI providers' best practices.
 
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11+-green)](https://python.org)
-[![Anthropic SDK](https://img.shields.io/badge/Anthropic-SDK-orange)](https://docs.anthropic.com/en/docs/sdks)
-[![OpenAI SDK](https://img.shields.io/badge/OpenAI-SDK-blue)](https://platform.openai.com/docs)
+## Features
+
+### Core Capabilities
+
+- **Multi-platform Adaptation** - One input, multiple optimized outputs for OpenAI, Anthropic, Google, Kimi, etc.
+- **Intelligent Optimization** - Agent automatically reads each platform's official prompting guidelines and applies best practices
+- **Parallel Processing** - Multiple optimization tasks run simultaneously for fast results
+- **Flexible Selection** - Choose single or multiple target platforms for optimization
+
+### How It Works
 
 ```
+User inputs prompt
+      ↓
+Select target platforms (OpenAI / Anthropic / Google / Kimi)
+      ↓
+Agent reads the corresponding platform's prompting guidelines
+      ↓
+Applies best practices for optimization
+      ↓
+Returns optimized prompt + change summary
+```
 
-## Adding New Providers
+### Supported Platforms
 
-Providers are **auto-detected** from `docs/`. To add one:
+| Platform | Optimization Features |
+|----------|----------------------|
+| OpenAI | Structured system messages, Markdown formatting |
+| Anthropic | XML tag structure, clear and direct instructions |
+| Google | Task/format/context pattern |
+| Kimi | Structured output formatting |
+
+## Installation
+
+### Requirements
+
+- Python 3.11+
+
+### Setup
 
 ```bash
-# 1. Create provider directory
-mkdir prompt_forge/docs/mistral
+# 1. Enter project directory
+cd prompt_forge
 
-# 2. Add documentation (scrape from official docs)
-cat > prompt_forge/docs/mistral/prompting.md << 'EOF'
-# Mistral Prompting Guidelines
+# 2. Install dependencies
+pip install -r requirements.txt
 
-## Best Practices
-- Use clear, structured instructions
-- Mistral models respond well to...
-EOF
+# 3. Configure environment variables
+cp env.example .env
 
-# 3. Restart server - new provider appears automatically
+# 4. Edit .env file
+# Choose LLM provider: anthropic or openrouter
+LLM_PROVIDER=openrouter
+
+# Enter API Key (choose one)
+OPENROUTER_API_KEY=your_key_here
+ANTHROPIC_API_KEY=your_key_here
 ```
 
-The agent will now:
-1. `list_provider_docs("mistral")` → `["prompting.md"]`
-2. `read_provider_doc("mistral", "prompting.md")` → Full guidelines
-3. Apply Mistral-specific patterns to optimize prompts
+### Start Service
 
-## Automatic Documentation Updates
-
-The `updater/` directory contains an autonomous agent that automatically updates prompting guides by scraping provider documentation using **Firecrawl** and synthesizing content with **Claude Opus**.
-
-### Updater Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Scheduler (Weekly)                        │
-│                         │                                    │
-│                         ▼                                    │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │         Claude Opus (Anthropic SDK)                 │    │
-│  │         Native Tool Calling + ReAct Loop            │    │
-│  │                                                     │    │
-│  │  Tools:                                             │    │
-│  │  • list_providers → Get configured providers        │    │
-│  │  • batch_scrape_urls (Firecrawl) → Fetch all docs   │    │
-│  │  • read_current_guide → Compare with existing       │    │
-│  │  • update_guide → Write synthesized content         │    │
-│  │  • write_update_log → Record update status          │    │
-│  └──────────────────────┬──────────────────────────────┘    │
-│                         │                                    │
-│                         ▼                                    │
-│              prompt_forge/docs/*.md                        │
-└─────────────────────────────────────────────────────────────┘
+```bash
+cd prompt_forge
+uvicorn main:app --reload --port 8000
 ```
 
-### Configuration
+Service available at: http://localhost:8000
 
-Add URLs for new providers in `updater/config.py`:
+## Usage
+
+### API Calls
+
+**Optimize for single platform:**
+
+```bash
+curl -X POST http://localhost:8000/optimize \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "You are a helpful assistant.",
+    "providers": ["openai"]
+  }'
+```
+
+**Optimize for multiple platforms:**
+
+```bash
+curl -X POST http://localhost:8000/optimize \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "You are a helpful assistant.",
+    "providers": ["openai", "anthropic", "google"]
+  }'
+```
+
+**List available platforms:**
+
+```bash
+curl http://localhost:8000/providers
+```
+
+### Python
 
 ```python
-PROVIDER_CONFIGS = {
-    "mistral": {
-        "name": "Mistral",
-        "urls": ["https://docs.mistral.ai/capabilities/completion/"],
-        "doc_file": "prompting.md"
-    }
-}
+import httpx
 
-CLAUDE_MODEL = "claude-opus-4-5-20251101"  # Model for synthesis
-MAX_TURNS = 5  # Max agent iterations
+response = httpx.post("http://localhost:8000/optimize", json={
+    "prompt": "You are a helpful assistant.",
+    "providers": ["anthropic"]
+})
+
+result = response.json()
+print(result["optimized"]["anthropic"]["prompt"])
+print(result["optimized"]["anthropic"]["changes"])
 ```
 
-Requires `ANTHROPIC_API_KEY` and `FIRECRAWL_API_KEY` in `.env`.
+### Response Example
 
-## Setup
+```json
+{
+  "original": "You are a helpful assistant.",
+  "optimized": {
+    "openai": {
+      "provider": "openai",
+      "prompt": "# Role\nYou are a helpful assistant...",
+      "changes": [
+        {"category": "structure", "description": "Added Markdown heading structure"},
+        {"category": "clarity", "description": "Clarified role definition and behavioral constraints"}
+      ],
+      "success": true
+    }
+  }
+}
+```
+
+## Adding New Platforms
+
+1. Create a new directory under `prompt_forge/docs/`
+2. Add the platform's prompting guide as `prompting.md`
+3. Restart the service - new platform is automatically detected
 
 ```bash
-# Backend
-cd prompt_forge
-pip install -r requirements.txt
-echo "OPENROUTER_API_KEY=your_key" > .env
-uvicorn main:app --reload --port 8000
-
-# Frontend
-cd ui
-npm install
-npm start
+mkdir prompt_forge/docs/mistral
+echo "# Mistral Prompting Guide\n..." > prompt_forge/docs/mistral/prompting.md
 ```
 
 ## License
