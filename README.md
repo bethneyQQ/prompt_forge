@@ -6,7 +6,7 @@ An intelligent prompt optimization system that automatically adapts your prompts
 
 ### Core Capabilities
 
-- **Multi-platform Adaptation** - One input, multiple optimized outputs for OpenAI, Anthropic, Google, Kimi, etc.
+- **Multi-platform Adaptation** - One input, multiple optimized outputs for OpenAI, Anthropic, Google, Kimi, Qwen, DeepSeek, etc.
 - **Intelligent Optimization** - Agent automatically reads each platform's official prompting guidelines and applies best practices
 - **Parallel Processing** - Multiple optimization tasks run simultaneously for fast results
 - **Flexible Selection** - Choose single or multiple target platforms for optimization
@@ -16,7 +16,7 @@ An intelligent prompt optimization system that automatically adapts your prompts
 ```
 User inputs prompt
       ↓
-Select target platforms (OpenAI / Anthropic / Google / Kimi)
+Select target platforms (OpenAI / Anthropic / Google / Kimi / Qwen / DeepSeek)
       ↓
 Agent reads the corresponding platform's prompting guidelines
       ↓
@@ -33,6 +33,8 @@ Returns optimized prompt + change summary
 | Anthropic | XML tag structure, clear and direct instructions |
 | Google | Task/format/context pattern |
 | Kimi | Structured output formatting |
+| Qwen | ChatML format, ReAct patterns, tool calling |
+| DeepSeek | Minimal prompting for R1, Chain-of-Draft |
 
 ## Installation
 
@@ -92,7 +94,7 @@ curl -X POST http://localhost:8000/optimize \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "You are a helpful assistant.",
-    "providers": ["openai", "anthropic", "google"]
+    "providers": ["openai", "anthropic", "google", "qwen", "deepseek"]
   }'
 ```
 
@@ -139,12 +141,41 @@ print(result["optimized"]["anthropic"]["changes"])
 ## Adding New Platforms
 
 1. Create a new directory under `prompt_forge/docs/`
-2. Add the platform's prompting guide as `prompting.md`
-3. Restart the service - new platform is automatically detected
+2. Add the platform's prompting guide as `prompting.md` (required)
+3. Optionally add `index.md` for documentation overview
+4. Restart the service - new platform is automatically detected
 
 ```bash
+# Create platform directory
 mkdir prompt_forge/docs/mistral
-echo "# Mistral Prompting Guide\n..." > prompt_forge/docs/mistral/prompting.md
+
+# Add prompting guide (required)
+cat > prompt_forge/docs/mistral/prompting.md << 'EOF'
+# Mistral Prompting Guide
+
+## Overview
+...
+
+## Key Principles
+...
+
+## Techniques
+...
+
+## Tips
+### Do's
+...
+### Don'ts
+...
+EOF
+
+# Add index (optional but recommended)
+cat > prompt_forge/docs/mistral/index.md << 'EOF'
+# Mistral Prompting Guidelines Index
+
+## Available Documents
+- **prompting.md**: Core prompting best practices...
+EOF
 ```
 
 ## License

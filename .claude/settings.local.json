@@ -3,7 +3,13 @@
     "allow": [
       "Bash(cat:*)",
       "Bash(python3 -m py_compile:*)",
-      "Bash(/usr/bin/python3 -m py_compile:*)"
+      "Bash(/usr/bin/python3 -m py_compile:*)",
+      "WebSearch",
+      "WebFetch(domain:qwen.readthedocs.io)",
+      "WebFetch(domain:lightrains.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.helicone.ai)",
+      "Bash(mkdir:*)"
     ]
   }
 }
