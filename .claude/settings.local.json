@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(python3 -m py_compile:*)",
+      "Bash(/usr/bin/python3 -m py_compile:*)"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+# LLM SDKs (native, no LangChain)
+anthropic>=0.40.0
+openai>=1.50.0
+
+# API Framework
+fastapi>=0.115.0
+uvicorn>=0.32.0
+
+# Data validation
+pydantic>=2.0
+
+# Utilities
+python-dotenv>=1.0.0
+httpx>=0.27.0
